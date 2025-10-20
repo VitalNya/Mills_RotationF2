@@ -1,0 +1,26 @@
+fastqc: used for performing quality control on raw throughput seq data.
+        * import BAM (Binary Alignment/Map)**compressed SAM(Sequence Alignment/Map)**human readable or FastQ files and lines start with '@'
+        * provide overview to tell which ares may have problems
+        * example comand : 
+          module avail fastqc # is it downloaded
+          module load fastqc # load it if its not
+          fastqc <file>.fastq # run fastqc
+          
+Alignment to Reference: align sequence to a reference genome 
+        * Tools: BWA
+        * example command:
+          module avail bwa 
+          module load bwa
+          bwa mem hg(37/38).fa <file>.fastqc > aln-pe.sam
+          
+Samtools: used to analize and manipualt files in SAM/DAM format
+        * convert sam fle to BAM files:
+            module avail samtools #check available versions
+            module load samtools/1.13 #load specific version
+        * sort BAM files
+            samtools view aln-pe.sam -b | samtools sort > aln-pe.bam
+            samtools index aln-pe.bam #
+        * index BAM file:
+            ls -lh aln-pe.sam
+            ls -lh aln-pe.bam
+Picard: Used to manipulate and modify SAM files
