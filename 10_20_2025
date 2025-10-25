@@ -23,4 +23,25 @@ Samtools: used to analize and manipualt files in SAM/DAM format
         * index BAM file:
             ls -lh aln-pe.sam
             ls -lh aln-pe.bam
-Picard: Used to manipulate and modify SAM files
+Picard: Used to manipulate and modify SAM files and remove duplicates
+       * example comand:
+       module avail picard
+       module load picard-tools/2.8.1
+
+       PicardCommandLine MarkDuplicates I=aln-pe.bam O=marked_duplicates.bam
+       M=marked_dup_metrics.txt
+
+       PicardCommandLine AddOrReplaceReadGroups I=marked_duplicates.bam
+       O=marked_duplicates.RG.bam RGID=1 RGLB=lib1 RGPL=illumina RGPU=unit1 RGSM=3
+
+Sumit a job:
+       nano bash.picard.sh #make file
+       sbatch bash.picard.sh 
+
+       squeue -u <UNIQ_NAME> # check the job running
+       less slurm-<job_id>.out # check the output
+
+       samtools view aln-pe.bam -f 0x400| wc -l #use samtools to view and check duplicates marked by picard
+       samtools view marked_duplicates.RG.bam -f 0x400 |wc -l
+       
+       
