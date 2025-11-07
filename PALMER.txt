@@ -1,0 +1,51 @@
+""" 
+Objective: Goal is to explore complex/repetitive variants and NUMTs (nuclear mitochondrial DNA segments)
+HAPMAPMIX.dac.30x.minimap2_GRCh38.aligned.sorted.bam → this is long-read sequencing data, already aligned to the GRCh38 human genome.
+
+You have two references:
+1) Nuclear genome:
+> GCA_000001405.15_GRCh38_no_alt_analysis_set.fna → use this when analyzing nuclear chromosomes (chr1–chr22, X, Y).
+2) Mitochondrial genome:
+> human_mitochondrion.fna or NC_012920.1.fasta → use this when analyzing mitochondrial sequences (chrM) or detecting NUMTs.
+
+NUMTs are fragments of mtDNA that exist in the nuclear genome. PALMER can help detect reads that map partially to mtDNA and partially to nuclear DNA—this is why you include both references.
+"""
+
+"""
+./PALMER --input /home/vitalnya/DATA.smart/HAPMAPMIX.dac.30x.minimap2_GRCh38.aligned.sorted.bam \
+--workdir workingdir/ \
+--ref_ver other \
+--output hapmap_chr21_numts \
+--chr chr21 \ #change
+--mode raw \
+--ref_fa /home/vitalnya/vitalnya/Mills_rotation/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
+--type CUSTOMIZED \
+--custom_seq /home/vitalnya/vitalnya/Mills_rotation/reference/human_mitochondrion.fna
+
+#This is specifically to find reads mapping to mitochondrial DNA and any NUMTs in the nuclear genome.
+#--custom_seq points to your mtDNA FASTA.
+#PALMER will split reads into those mapping to the mtDNA and nuclear genome and help detect NUMTs, which are important for your aging and chromatin structure questions
+"""
+
+"""
+NUMTs predicted Example:
+Approx. chr21 position (bp)	Cluster count	Notes
+7,305,395 – 7,320,302	3 clusters	Small region; multiple overlapping calls
+8,856,008 – 8,856,021	4 clusters	One major insertion (~mtDNA 5613–10302) with an inverted segment
+10,324,663	1 cluster	Small NUMT from mtDNA 8489–9827
+10,269,872	1 cluster	Similar mtDNA region (8489–9827)
+13,521,235	1 cluster	Small NUMT (mtDNA 6182–6231)
+18,309,110	5 clusters	Multiple overlapping calls; mtDNA 6800–10,500 region
+21,747,335	1 cluster	Small NUMT (mtDNA 2898–3071)
+21,708,298	1 cluster	Larger; 16 supporting reads
+21,302,721	1 cluster	Small NUMT (mtDNA 629–941)
+26,816,482	1 cluster	mtDNA 7573–7639
+27,223,949	1 cluster	mtDNA 6272–6998
+31,150,104	1 cluster	mtDNA 5955–6038
+32,935,918	1 cluster	mtDNA 956–1124
+35,912,729	1 cluster	mtDNA 4536–6445
+36,487,091	1 cluster	mtDNA 6903–6949
+39,472,210	2 clusters	mtDNA 3512–4477
+41,529,307	1 cluster	mtDNA 5955–6038
+42,368,329	1 cluster	mtDNA 2411–2574
+"""
