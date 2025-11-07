@@ -1,0 +1,46 @@
+"""
+# 1. Download the human genome (GRCh38 no-alt reference)
+wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
+
+# 2. Decompress the genome
+gunzip GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
+> GCA_000001405.15_GRCh38_no_alt_analysis_set.fna 
+
+# 3. Extract the mitochondrial DNA sequence (chrM) from the GRCh38 reference
+awk '/^>chrM/{flag=1; print; next} /^>/{flag=0} flag' GCA_000001405.15_GRCh38_no_alt_analysis_set.fna > human_mitochondrion.fna
+
+# 4. Download the NCBI reference mitochondrial genome (NC_012920.1)
+wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/008/865/GCF_000008865.2_ASM886v2/NC_012920.1.fna -O NC_012920.1.fasta
+
+# 5. BLAST comparison
+makeblastdb -in NC_012920.1.fasta -dbtype nucl -out mito_db
+blastn -query human_mitochondrion.fna -db mito_db -out mito_blast_results.txt -outfmt 6
+  
+# 6. BLAST results
+> cat mito_blast_results.txt
+chrM    NC_012920.1     100.000 16569   0       0       1       16569   1       16569   0.0     30594  
+"""
+  
+"""
+#!/bin/bash
+#SBATCH --job-name=HAPMAPMIX.dac.30x
+#SBATCH --mail-user=vitalnya@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --account=remills0
+#SBATCH --partition=standard
+#SBATCH --time=10:00:00
+#SBATCH --nodes=1
+#SBATCH --mem-per-cpu=6g
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=2
+
+./PALMER --input /home/vitalnya/DATA.smart/HAPMAPMIX.dac.30x.minimap2_GRCh38.aligned.sorted.bam \
+--workdir workingdir/ \
+--ref_ver other \
+--output hapmap_chr21_numts \
+--chr chr21 \
+--mode raw \
+--ref_fa /home/vitalnya/vitalnya/Mills_rotation/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
+--type CUSTOMIZED \
+--custom_seq /home/vitalnya/vitalnya/Mills_rotation/reference/human_mitochondrion.fna
+"""
