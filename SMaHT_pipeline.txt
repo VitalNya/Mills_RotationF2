@@ -1,0 +1,5 @@
+"""
+The pipeline will process a long-read file and run PALMER on all 23 chromosome pairs.
+
+
+"""
