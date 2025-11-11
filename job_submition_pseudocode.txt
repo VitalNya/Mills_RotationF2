@@ -1,32 +1,31 @@
+#!/bin/bash
 # ------------------------------------------------------------
 # Purpose:
 #   Automate PALMER runs for multiple long-read sequencing datasets.
 #   For each long-read sample, submit SLURM jobs across chromosomes 1–22.
-#   Each job calls 'palmer.sh' with arguments: (long_read, workdir, chr)
-#
-# Dependencies:
-#   - PALMER executable in working directory
-#   - SLURM job scheduler (sbatch command available)
-#   - Reference FASTA files in specified paths
+#   Each job calls 'palmer.sh' with arguments: (data_path, workdir, chr)
 # ------------------------------------------------------------
 
-# Path to the directory containing list of long-read datasets
-list = ./SMaHt_list_directory/
+# Path to text file containing list of dataset names (one per line)
+LIST="./SMaHT_list_directory/sample_list.txt"
 
-# Iterate through each long-read dataset in the list
-for read in list:
-    
-    # Define the absolute path to the long-read dataset
-    long_read = /SMaHT/long_read_name
-    
-    # Define a working directory specific to this dataset
-    workdir = f"{long_read}_workingdir"
-    
-    # Loop through human autosomes (chromosomes 1 to 22)
-    for i in range(1, 23):
-        # Define the chromosome name
-        chr = f"chr{i}"
-        
-        # Submit a PALMER job for this sample and chromosome
-        # palmer.sh will receive arguments: input, workdir, chr
-        sbatch palmer.sh $long_read $workdir $chr
+# Directory containing actual long-read data
+DATA_BASE="/home/vitalnya/DATA.smart"
+
+# Loop through each long-read dataset in the list
+while read -r LONG_READ; do
+    [[ -z "$LONG_READ" || "$LONG_READ" == \#* ]] && continue
+
+    # Full path to this dataset’s data
+    DATA_PATH="${DATA_BASE}/${LONG_READ}"
+
+    # Define working directory
+    WORKDIR="/SMaHT/${LONG_READ}_workingdir"
+    mkdir -p "$WORKDIR"
+
+    # Loop through chromosomes 1–22
+    for CHR in {1..22}; do
+        sbatch palmer.sh "$DATA_PATH" "$WORKDIR" "chr${CHR}"
+    done
+
+done < "$LIST"
