@@ -3,30 +3,44 @@
 # Purpose:
 #   Automate PALMER runs for multiple long-read sequencing datasets.
 #   For each long-read sample, submit SLURM jobs across chromosomes 1–22.
-#   Each job calls 'palmer.sh' with arguments: (long_read, workdir, chr)
-#
-# Dependencies:
-#   - PALMER executable in working directory
-#   - SLURM job scheduler (sbatch command available)
-#   - Reference FASTA files in specified paths
+#   Each job calls 'palmer.sh' with arguments: (data_path, workdir, chr)
 # ------------------------------------------------------------
 
-# Directory containing list of long-read dataset names (one per line)
-LIST="./SMaHT_list_directory/sample_list.txt"
+# Path to text file containing list of dataset names (one per line)
+LIST="/home/vitalnya/vitalnya/Mills_rotation/long_reads_1.list"
 
-# Loop through each long-read dataset listed in LIST
+# Directory containing actual long-read data
+DATA_BASE="/home/vitalnya/DATA.smart"
+
+# Directory where SMaHT output folders will live
+OUTPUT_BASE="/home/vitalnya/vitalnya/Mills_rotation/SMaHT"
+
+# Save the current working directory
+CUR_WKD=$(pwd)
+
+# Loop through each long-read dataset
 while read -r LONG_READ; do
-    # Skip empty lines or comment lines
     [[ -z "$LONG_READ" || "$LONG_READ" == \#* ]] && continue
 
-    # Define the working directory for this sample
-    WORKDIR="/SMaHT/${LONG_READ}_workingdir"
+    # Full path to this dataset’s data
+    DATA_PATH="${DATA_BASE}/${LONG_READ}"
+
+    # Define parent directory for this dataset
+    PARENT_DIR="${OUTPUT_BASE}/${LONG_READ}_workingdir"
+    mkdir -p "$PARENT_DIR"
+
+    # Define working directory inside the parent directory
+    WORKDIR="${PARENT_DIR}/workingdir"
     mkdir -p "$WORKDIR"
 
-    # Loop through chromosomes 1–22
-    for CHR in {1..22}; do
-        echo "Submitting PALMER job for ${LONG_READ} on chr${CHR}..."
-        sbatch palmer.sh "$LONG_READ" "$WORKDIR" "chr${CHR}"
+    # Loop through chromosomes 1–22 and submit jobs
+    for CHR in {21..22}; do
+        WORKDIR="${PARENT_DIR}/workingdir_chr${CHR}"
+        mkdir -p "$WORKDIR"
+        sbatch PALMER_pipline.sh "$DATA_PATH" "$WORKDIR" "chr${CHR}"
     done
+
+    # Return to the original directory before processing the next dataset
+    cd "$CUR_WKD"
 
 done < "$LIST"
