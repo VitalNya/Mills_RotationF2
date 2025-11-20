@@ -7,7 +7,7 @@
 # ------------------------------------------------------------
 
 # Path to text file containing list of dataset names (one per line)
-LIST="/home/vitalnya/vitalnya/Mills_rotation/long_reads_1.list"
+LIST="/home/vitalnya/vitalnya/Mills_rotation/long_reads.list"
 
 # Directory containing actual long-read data
 DATA_BASE="/home/vitalnya/DATA.smart"
@@ -29,12 +29,8 @@ while read -r LONG_READ; do
     PARENT_DIR="${OUTPUT_BASE}/${LONG_READ}_workingdir"
     mkdir -p "$PARENT_DIR"
 
-    # Define working directory inside the parent directory
-    WORKDIR="${PARENT_DIR}/workingdir"
-    mkdir -p "$WORKDIR"
-
     # Loop through chromosomes 1–22 and submit jobs
-    for CHR in {21..22}; do
+    for CHR in {1..22}; do
         WORKDIR="${PARENT_DIR}/workingdir_chr${CHR}"
         mkdir -p "$WORKDIR"
         sbatch PALMER_pipline.sh "$DATA_PATH" "$WORKDIR" "chr${CHR}"
