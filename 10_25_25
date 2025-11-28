@@ -1,0 +1,25 @@
+Download Reference NUMTs:
+
+UCSC Genome Browser → Table Browser → numt track for the relevant genome version.
+
+Download Non-reference Germline NUMTs:
+
+From PI’s PLOS Biology 2024 paper (likely supplementary tables).
+
+From Wei et al., Nature NUMT paper.
+
+Filter Your Data:
+
+Remove anything overlapping with reference NUMTs.
+
+Remove anything matching the published germline NUMTs.
+
+The remaining calls are candidate somatic NUMTs.
+
+HapMapmixing Benchmark:
+
+Use the “truth set” once your PI provides it for validation.
+
+Check Wang et al., MEI benchmarking paper:
+
+Follow their workflow for filtering and benchmarking MEIs/NUMTs. This gives you a validated procedure to follow.
