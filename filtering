@@ -22,7 +22,7 @@ Reference data were pulled from Wei et al. (2024), Nature NUMT paper.
     sort -k1,1 -k2,2n refNumts.38.50.bed > refNumts.sorted.bed
 
     #bedtools subtract [OPTIONS] -a <BED/GFF/VCF> -b <BED/GFF/VCF>
-    bedtools subtract -wa -wb -a chr1_numts.sorted.bed -b refNumts.sorted.bed > numts_Nonoverlap.bed
+    bedtools intersect -v -a chr2_numts.sorted.bed -b refNumts.sorted.bed > numts_nonoverlap.bed
 
   #Remove anything matching the published germline NUMTs.
   The remaining calls are candidate somatic NUMTs.
