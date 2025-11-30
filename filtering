@@ -8,6 +8,7 @@ Reference data were pulled from Wei et al. (2024), Nature NUMT paper.
     bedtools slop -i refNumts.38.bed -g hg38.genome -b 50 > refNumts.38.50bp.bed 
 
 2) Download Non-reference Germline NUMTs: 
+    https://github.com/mills-lab/numts-and-aging-in-fibroblasts-and-brains/tree/main/callset/Numt
   a) wget https://raw.githubusercontent.com/mills-lab/numts-and-aging-in-fibroblasts-and-brains/main/callset/Numt/Numt.1000G.20221202.tar.gz
   b) tar -xzvf Numt.1000G.20221202.tar.gz
   - Using: Numt.1000G/ALL.dinumt.NumtS.1000G.HC.20200604.gt.vcf.gz * Numt.1000G/ directory
