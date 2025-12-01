@@ -14,22 +14,44 @@ Reference data were pulled from Wei et al. (2024), Nature NUMT paper.
   - Using: Numt.1000G/ALL.dinumt.NumtS.1000G.HC.20200604.gt.vcf.gz * Numt.1000G/ directory
 
 3) Filter Your Data:
-  #Remove anything overlapping with reference NUMTs.
     # Convert the numts calls txt file Palmer outputs to a bed format
     awk 'NR>1 {print $2"\t"$3"\t"$5"\t"$1"\t"$12"\t"$15}' Output_chr1_numts_calls.txt > chr1_numts.bed
 
-    #Sort the bed frames
-    sort -k1,1 -k2,2n chr1_numts.bed > chr1_numts.sorted.bed
-    sort -k1,1 -k2,2n refNumts.38.50.bed > refNumts.sorted.bed
+    #Prepare reference NUMTs
+      sort -k1,1 -k2,2n refNumts.38.bed \
+      | bedtools merge -d 50 \
+      > refNumts.merged50.bed
 
-    #bedtools subtract [OPTIONS] -a <BED/GFF/VCF> -b <BED/GFF/VCF>
-    bedtools intersect -v -a chr2_numts.sorted.bed -b refNumts.sorted.bed > numts_nonoverlap.bed
-     * -v = give me entries in A that have no overlap with B 
-     * -a your NUMTs
-     * -b reference NUMTs
+    #Prepare published germline NUMTs.
+      sort -k1,1 -k2,2n GermLineNumt1000g.bed \
+      | bedtools merge -d 50 \
+      > germline.merged50.bed
 
-  #Remove anything matching the published germline NUMTs.
-  The remaining calls are candidate somatic NUMTs.
+    #Combine ref and germline and merge 
+      cat refNumts.merged50.bed germline.merged50.bed \
+      | sort -k1,1 -k2,2n \
+      | bedtools merge -d 50 \
+      > exclude_all.merged50.bed
+
+    #The remaining calls are candidate somatic NUMTs.
+      cat refNumts.merged50.bed germline.merged50.bed \
+      | sort -k1,1 -k2,2n \
+      | bedtools merge -d 50 \
+      > exclude_all.merged50.bed
+
+    #PALMER calls with 50bp buffer
+      sort -k1,1 -k2,2n chr1_numts.bed \
+      | bedtools merge -d 50 \
+      > chr1_numts.merged50.bed
+
+    #Potentaial NUMTS
+      bedtools intersect -v \
+      -a chr1_numts.merged50.bed \
+      -b exclude_all.merged50.bed \
+      > chr1_somatic_candidates.bed
+
+    #Compare with true data set
+  
 
 4) HapMapmixing Benchmark:
   Use the “truth set” once your PI provides it for validation.
