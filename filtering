@@ -47,8 +47,13 @@ Reference data were pulled from Wei et al. (2024), Nature NUMT paper.
       -a chr1_numts.merged50.bed \
       -b exclude_all.merged50.bed \
       > chr1_somatic_candidates.bed
-  
+   
+    #Give all intervals in A (chr2_numts.merged50.bed) that overlap anything in B (exclude_all.merged50.bed)
+      bedtools intersect \
+      -a chr2_numts.merged50.bed \
+      -b exclude_all.merged50.bed \
+      > chr2_overlapping_candidates.bed
+
 
 4) HapMapmixing Benchmark:
-  Use the “truth set” once your PI provides it for validation.
-  Check Wang et al., MEI benchmarking paper:
+  Use the “truth set” once provided it for validation.
