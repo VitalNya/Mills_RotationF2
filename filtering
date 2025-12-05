@@ -13,47 +13,33 @@ Reference data were pulled from Wei et al. (2024), Nature NUMT paper.
 
 3) Filter Your Data:
     # Convert the numts calls txt file Palmer outputs to a bed format
-    awk 'NR>1 {print $2"\t"$3"\t"$5"\t"$1"\t"$12"\t"$15}' Output_chr1_numts_calls.txt > chr1_numts.bed
+    awk 'NR>1 {print $2"\t"$3"\t"$5"\t"$1"\t"$12"\t"$15}' Output_numts_calls.txt > all_numts.bed
 
-    #Prepare reference NUMTs
-      sort -k1,1 -k2,2n refNumts.38.bed \
-      | bedtools merge -d 50 \
-      > refNumts.merged50.bed
-
-    #Prepare published germline NUMTs.
-      sort -k1,1 -k2,2n GermLineNumt1000g.bed \
-      | bedtools merge -d 50 \
-      > germline.merged50.bed
-
-    #Combine ref and germline and merge 
-      cat refNumts.merged50.bed germline.merged50.bed \
-      | sort -k1,1 -k2,2n \
-      | bedtools merge -d 50 \
-      > exclude_all.merged50.bed
-
-    #The remaining calls are candidate somatic NUMTs.
-      cat refNumts.merged50.bed germline.merged50.bed \
-      | sort -k1,1 -k2,2n \
-      | bedtools merge -d 50 \
-      > exclude_all.merged50.bed
-
-    #PALMER calls with 50bp buffer
-      sort -k1,1 -k2,2n chr1_numts.bed \
-      | bedtools merge -d 50 \
-      > chr1_numts.merged50.bed
-
-    #Potentaial NUMTS
-      bedtools intersect -v \
-      -a chr1_numts.merged50.bed \
-      -b exclude_all.merged50.bed \
-      > chr1_somatic_candidates.bed
-   
-    #Give all intervals in A (chr2_numts.merged50.bed) that overlap anything in B (exclude_all.merged50.bed)
-      bedtools intersect \
-      -a chr2_numts.merged50.bed \
-      -b exclude_all.merged50.bed \
-      > chr2_overlapping_candidates.bed
-
+  # Add 25 bp upstream and downstream
+  bedtools slop -i all_numts.bed -g hg38.genome -b 25 > all_numts.slop25.bed
+  bedtools slop -i refNumts.38.bed -g hg38.genome -b 25 > refNumts.slop25.bed
+  bedtools slop -i GermLineNumt1000g.bed -g hg38.genome -b 25 > germline.slop25.bed
+  
+  
+  sort -k1,1 -k2,2n refNumts.slop25.bed | bedtools merge > refNumts.merged.bed
+  sort -k1,1 -k2,2n germline.slop25.bed | bedtools merge > germline.merged.bed
+  
+  
+  # Merge reference and germline NUMTs separately
+  sort -k1,1 -k2,2n refNumts.slop25.bed | bedtools merge > refNumts.merged.bed
+  sort -k1,1 -k2,2n germline.slop25.bed | bedtools merge > germline.merged.bed
+  
+  # Combine reference + germline and merge again
+  cat refNumts.merged.bed germline.merged.bed | sort -k1,1 -k2,2n | bedtools merge > exclude_all.bed
+  
+  # Merge PALMER calls (with buffer) to handle nearby calls
+  sort -k1,1 -k2,2n all_numts.slop25.bed | bedtools merge > all_numts.merged.bed
+  
+  # Keep calls that do NOT overlap reference or germline NUMTs
+  bedtools intersect -v -a all_numts.merged.bed -b exclude_all.bed > all_somatic_candidates.bed
+  
+  # Get full PALMER info for somatic calls
+  bedtools intersect -wa -wb -a all_somatic_candidates.bed -b all_numts.bed > all_somatic_candidates_full.txt
 
 4) HapMapmixing Benchmark:
-  Use the “truth set” once provided it for validation.
+  Use the “truth set” once provided for validation.
