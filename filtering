@@ -22,12 +22,11 @@
     bedtools slop -i GermLineNumt1000g.bed -g hg38.genome -b 25 > germline.slop25.bed
     bedtools slop -i numts_nonreference_wei.bed -g hg38.genome -b 25 > wei_germline.slop25.bed
     
-    # Merge reference and germline NUMTs separately
+    # Merge reference and germline NUMTs separately 
     sort -k1,1 -k2,2n refNumts.slop25.bed | bedtools merge > refNumts.merged.bed
     sort -k1,1 -k2,2n germline.slop25.bed | bedtools merge > germline.merged.bed
-    cat germline.slop25.bed wei_germline.slop25.bed | sort -k1,1 -k2,2n | bedtools merge > merged_nonRef.bed
-
     sort -k1,1 -k2,2n all_numts.slop25.bed | bedtools merge > all_numts.merged.bed
+    cat germline.slop25.bed wei_germline.slop25.bed | sort -k1,1 -k2,2n | bedtools merge > merged_nonRef.bed
   
     # Overlapping with germline and reference
     bedtools intersect -a all_numts.merged.bed -b germline.merged.bed > overlapping_germline.bed
