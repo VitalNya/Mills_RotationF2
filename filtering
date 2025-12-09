@@ -1,15 +1,16 @@
-Reference data were pulled from Wei et al. (2024), Nature NUMT paper.
-
 1) Download Reference NUMTs:
   a) Reference Numts data comes from: https://github.com/mills-lab/dinumt/blob/master/refNumts.38.bed 
     wget https://raw.githubusercontent.com/mills-lab/dinumt/master/refNumts.38.bed 
 
 2) Download Non-reference Germline NUMTs: 
     https://github.com/mills-lab/numts-and-aging-in-fibroblasts-and-brains/tree/main/callset/Numt
+    https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-022-05288-7/MediaObjects/41586_2022_5288_MOESM4_ESM.xlsx <-wei et al non_reference germline (numts_nonreference_wei.bed) * was a exel file. Supplementary Table 1. Full list of NUMTs detected in rare disease genomes" was converted to bed file using a Python script 
   a) wget https://raw.githubusercontent.com/mills-lab/numts-and-aging-in-fibroblasts-and-brains/main/callset/Numt/Numt.1000G.20221202.tar.gz
   b) tar -xzvf Numt.1000G.20221202.tar.gz
   - Using: Numt.1000G/ALL.dinumt.NumtS.1000G.HC.20200604.gt.vcf.gz * Numt.1000G/ directory
     bcftools query -f '%CHROM\t%POS0\t%END\n' ALL.dinumt.NumtS.1000G.HC.20200604.gt.vcf.gz > GermLineNumt1000g.bed
+
+    #overlapping or adjacent intervals combined into a single region, use BEDTools
 
 3) Filter Your Data:
     # Convert the numts calls txt file Palmer outputs to a bed format
@@ -19,10 +20,13 @@ Reference data were pulled from Wei et al. (2024), Nature NUMT paper.
     bedtools slop -i all_numts.bed -g hg38.genome -b 25 > all_numts.slop25.bed
     bedtools slop -i refNumts.38.bed -g hg38.genome -b 25 > refNumts.slop25.bed
     bedtools slop -i GermLineNumt1000g.bed -g hg38.genome -b 25 > germline.slop25.bed
+    bedtools slop -i numts_nonreference_wei.bed -g hg38.genome -b 25 > wei_germline.slop25.bed
     
     # Merge reference and germline NUMTs separately
     sort -k1,1 -k2,2n refNumts.slop25.bed | bedtools merge > refNumts.merged.bed
     sort -k1,1 -k2,2n germline.slop25.bed | bedtools merge > germline.merged.bed
+    cat germline.slop25.bed wei_germline.slop25.bed | sort -k1,1 -k2,2n | bedtools merge > merged_nonRef.bed
+
     sort -k1,1 -k2,2n all_numts.slop25.bed | bedtools merge > all_numts.merged.bed
   
     # Overlapping with germline and reference
