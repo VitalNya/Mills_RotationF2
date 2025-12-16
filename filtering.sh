@@ -1,18 +1,18 @@
-1) Download Reference NUMTs:
-  a) Reference Numts data comes from: https://github.com/mills-lab/dinumt/blob/master/refNumts.38.bed 
+#1) Download Reference NUMTs:
+  #a) Reference Numts data comes from: https://github.com/mills-lab/dinumt/blob/master/refNumts.38.bed 
     wget https://raw.githubusercontent.com/mills-lab/dinumt/master/refNumts.38.bed 
 
-2) Download Non-reference Germline NUMTs: 
+#2) Download Non-reference Germline NUMTs: 
     https://github.com/mills-lab/numts-and-aging-in-fibroblasts-and-brains/tree/main/callset/Numt
-    https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-022-05288-7/MediaObjects/41586_2022_5288_MOESM4_ESM.xlsx <-wei et al non_reference germline (numts_nonreference_wei.bed) * was a exel file. Supplementary Table 1. Full list of NUMTs detected in rare disease genomes" was converted to bed file using a Python script 
-  a) wget https://raw.githubusercontent.com/mills-lab/numts-and-aging-in-fibroblasts-and-brains/main/callset/Numt/Numt.1000G.20221202.tar.gz
-  b) tar -xzvf Numt.1000G.20221202.tar.gz
-  - Using: Numt.1000G/ALL.dinumt.NumtS.1000G.HC.20200604.gt.vcf.gz * Numt.1000G/ directory
+    https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-022-05288-7/MediaObjects/41586_2022_5288_MOESM4_ESM.xlsx <-wei et al non_reference germline (numts_nonreference_wei.bed) #* was a exel file. Supplementary Table 1. Full list of NUMTs detected in rare disease genomes" was converted to bed file using a Python script 
+    wget https://raw.githubusercontent.com/mills-lab/numts-and-aging-in-fibroblasts-and-brains/main/callset/Numt/Numt.1000G.20221202.tar.gz
+    tar -xzvf Numt.1000G.20221202.tar.gz
+    Numt.1000G/ALL.dinumt.NumtS.1000G.HC.20200604.gt.vcf.gz #* Numt.1000G/ directory
     bcftools query -f '%CHROM\t%POS0\t%END\n' ALL.dinumt.NumtS.1000G.HC.20200604.gt.vcf.gz > GermLineNumt1000g.bed
 
     #overlapping or adjacent intervals combined into a single region, use BEDTools
 
-3) Filter Your Data:
+#3) Filter Your Data:
     # Convert the numts calls txt file Palmer outputs to a bed format 7,9
     awk 'NR>1 {print $2"\t"$3"\t"$5"\t"$7"\t"$9"\t"$1"\t"$12"\t"$15}' Output_numts_calls.txt > <PALMER_calls>.bed
 
@@ -41,5 +41,5 @@
     bedtools intersect -wa -wb -a overlapping_reference.bed -b <PALMER_calls>.bed > overlapping_reference_full.txt
     bedtools intersect -wa -wb -a somatic_candidates.bed -b <PALMER_calls>.bed > somatic_candidates_full.txt
 
-4) HapMapmixing Benchmark:
-  Use the “truth set” once provided for validation.
+#4) HapMapmixing Benchmark:
+  #Use the “truth set” once provided for validation.
