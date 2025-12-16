@@ -1,1 +1,0 @@
-../../../HapMapmerged_numts_calls.txt
