@@ -14,4 +14,3 @@ awk -v FS='\t' -v OFS='\t' '
     print $0, dirname
 }
 ' input.txt > output_with_directory.txt
-
